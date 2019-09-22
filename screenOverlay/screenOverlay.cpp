@@ -7,8 +7,8 @@
 HDC dc = GetDC(HWND_DESKTOP);
 int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-const int width = 160;
-const int height = 160;
+const int width = 180;
+const int height = 180;
 
 /*
 COLORREF colour = RGB(255, 0, 0); // red
@@ -84,6 +84,7 @@ void capture(POINT a, POINT b) {
 	DeleteDC(hDC);
 	ReleaseDC(NULL, hScreen);
 	DeleteObject(hBitmap);
+	delete[] pixels;
 }
 
 int main() {
