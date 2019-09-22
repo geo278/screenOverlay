@@ -9,6 +9,10 @@ int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 const int width = 180;
 const int height = 180;
+const int ax = screenWidth / 2 - width / 2;
+const int ay = screenHeight / 2 - height / 2;
+const int bx = screenWidth / 2 + width / 2;
+const int by = screenHeight / 2 + height / 2;
 
 /*
 COLORREF colour = RGB(255, 0, 0); // red
@@ -44,13 +48,13 @@ RGBQUAD* zoom(RGBQUAD* pixels) {
 	return result;
 }
 
-void capture(POINT a, POINT b) {
+void capture() {
 	// copy screen to bitmap
 	HDC     hScreen = GetDC(NULL);
 	HDC     hDC = CreateCompatibleDC(hScreen);
-	HBITMAP hBitmap = CreateCompatibleBitmap(hScreen, abs(b.x - a.x), abs(b.y - a.y));
+	HBITMAP hBitmap = CreateCompatibleBitmap(hScreen, abs(bx - ax), abs(by - ay));
 	HGDIOBJ old_obj = SelectObject(hDC, hBitmap);
-	BOOL    bRet = BitBlt(hDC, 0, 0, abs(b.x - a.x), abs(b.y - a.y), hScreen, a.x, a.y, SRCCOPY); // BitBlt does the copying
+	BOOL    bRet = BitBlt(hDC, 0, 0, abs(bx - ax), abs(by - ay), hScreen, ax, ay, SRCCOPY); // BitBlt does the copying
 
 	// Array conversion:
 	RGBQUAD* pixels = new RGBQUAD[width * height];
@@ -77,7 +81,7 @@ void capture(POINT a, POINT b) {
 
 	int displacement = 200;
 	// renders pixels on screen at displacement lower than center
-	SetDIBitsToDevice(dc, a.x, a.y + displacement, width * 2, height * 2, 0, 0, 0, height * 2, zoom(pixels), (BITMAPINFO*)& bmiZoom, DIB_RGB_COLORS); // will need to update parameters after implementation of zoom
+	SetDIBitsToDevice(dc, ax, ay + displacement, width * 2, height * 2, 0, 0, 0, height * 2, zoom(pixels), (BITMAPINFO*)& bmiZoom, DIB_RGB_COLORS); // will need to update parameters after implementation of zoom
 
 	// clean up
 	SelectObject(hDC, old_obj);
@@ -87,15 +91,19 @@ void capture(POINT a, POINT b) {
 	delete[] pixels;
 }
 
-int main() {
-	POINT a, b;
-	a.x = screenWidth / 2 - width / 2;
-	a.y = screenHeight / 2 - height / 2;
-	b.x = screenWidth / 2 + width / 2;
-	b.y = screenHeight / 2 + height / 2;
+void captureThread() {
 	while (true) {
-		capture(a, b);
+		capture();
 		Sleep(1);
+	}
+}
+
+int main() {
+	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)captureThread, 0, 0, 0);
+	Sleep(0.5);
+	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)captureThread, 0, 0, 0);
+	while (true) {
+		Sleep(1000);
 	}
 }
 
