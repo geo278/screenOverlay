@@ -7,8 +7,8 @@
 HDC dc = GetDC(HWND_DESKTOP);
 int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-int width = 160;
-int height = 160;
+const int width = 160;
+const int height = 160;
 
 /*
 COLORREF colour = RGB(255, 0, 0); // red
@@ -31,10 +31,12 @@ void col(int height) {
 */
 
 RGBQUAD* zoom(RGBQUAD* pixels) {
-	// TODO: implement zoom
-
-
-	return pixels;
+	// TODO: implement zoom 
+	static RGBQUAD result[width * height * 4];
+	for (int i = 0; i < width * height; i++) {
+		result[i] = pixels[i];
+	}
+	return result;
 }
 
 void capture(POINT a, POINT b) {
