@@ -5,12 +5,13 @@
 #include <Windows.h>
 
 HDC dc = GetDC(HWND_DESKTOP);
-COLORREF colour = RGB(255, 0, 0); // red
 int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 int width = 160;
 int height = 160;
 
+/*
+COLORREF colour = RGB(255, 0, 0); // red
 void row(int width) {
 	for (int i = 0; i < width; i++) {
 		SetPixel(dc, i + screenWidth / 2 - width / 2, screenHeight / 2 - 1, colour);
@@ -27,22 +28,22 @@ void col(int height) {
 		SetPixel(dc, screenWidth / 2, i + screenHeight / 2 - height / 2, colour);
 	}
 }
+*/
 
-RGBQUAD* capture(POINT a, POINT b) {
+RGBQUAD* zoom(RGBQUAD* pixels) {
+	// TODO: implement zoom
+
+
+	return pixels;
+}
+
+void capture(POINT a, POINT b) {
 	// copy screen to bitmap
 	HDC     hScreen = GetDC(NULL);
 	HDC     hDC = CreateCompatibleDC(hScreen);
 	HBITMAP hBitmap = CreateCompatibleBitmap(hScreen, abs(b.x - a.x), abs(b.y - a.y));
 	HGDIOBJ old_obj = SelectObject(hDC, hBitmap);
 	BOOL    bRet = BitBlt(hDC, 0, 0, abs(b.x - a.x), abs(b.y - a.y), hScreen, a.x, a.y, SRCCOPY); // BitBlt does the copying
-
-	/*
-	// save bitmap to clipboard
-	OpenClipboard(NULL);
-	EmptyClipboard();
-	SetClipboardData(CF_BITMAP, hBitmap);
-	CloseClipboard();
-	*/
 
 	// Array conversion:
 	RGBQUAD* pixels = new RGBQUAD[width * height];
@@ -54,41 +55,32 @@ RGBQUAD* capture(POINT a, POINT b) {
 	bmi.biWidth = width;
 	bmi.biHeight = -height;
 	bmi.biCompression = BI_RGB;
-	bmi.biSizeImage = 0;// 3 * ScreenX * ScreenY;
+	bmi.biSizeImage = 0; // 3 * ScreenX * ScreenY
 
 	GetDIBits(hDC, hBitmap, 0, height, pixels, (BITMAPINFO*)& bmi, DIB_RGB_COLORS);
 
 	int displacement = 200;
 	// renders pixels on screen at displacement lower than center
-	SetDIBitsToDevice(dc, a.x, a.y + displacement, width, height, 0, 0, 0, height, pixels, (BITMAPINFO*)& bmi, DIB_RGB_COLORS);
-
+	SetDIBitsToDevice(dc, a.x, a.y + displacement, width, height, 0, 0, 0, height, zoom(pixels), (BITMAPINFO*)& bmi, DIB_RGB_COLORS); // will need to update parameters after implementation of zoom
 
 	// clean up
 	SelectObject(hDC, old_obj);
 	DeleteDC(hDC);
 	ReleaseDC(NULL, hScreen);
 	DeleteObject(hBitmap);
-	return pixels;
 }
 
 int main() {
 	POINT a, b;
-	a.x = 1920 / 2 - width / 2;
-	a.y = 1080 / 2 - height / 2;
-	b.x = 1920 / 2 + width / 2;
-	b.y = 1080 / 2 + height / 2;
-	RGBQUAD* pixels;
+	a.x = screenWidth / 2 - width / 2;
+	a.y = screenHeight / 2 - height / 2;
+	b.x = screenWidth / 2 + width / 2;
+	b.y = screenHeight / 2 + height / 2;
+	//RGBQUAD* pixels;
 	while (true) {
-
-		pixels = capture(a, b);
-
-
-
-
-
-		Sleep(10);
+		capture(a, b);
+		Sleep(8);
 	}
-		//CreateThread(0, 0, (LPTHREAD_START_ROUTINE) CrossThread, 0, 0, 0);
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
