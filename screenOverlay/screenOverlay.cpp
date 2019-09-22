@@ -31,10 +31,15 @@ void col(int height) {
 */
 
 RGBQUAD* zoom(RGBQUAD* pixels) {
-	// TODO: implement zoom 
-	static RGBQUAD result[width * height * 4];
-	for (int i = 0; i < width * height; i++) {
-		result[i] = pixels[i];
+	const int size = width * height * 4;
+	static RGBQUAD result[size];
+	int resultX, resultY, pixelsX, pixelsY;
+	for (int i = 0; i < size; i++) {
+		resultX = i % (width * 2);
+		resultY = i / (width * 2);
+		pixelsX = resultX / 2;
+		pixelsY = resultY / 2;
+		result[i] = pixels[pixelsY * width + pixelsX];
 	}
 	return result;
 }
@@ -61,9 +66,18 @@ void capture(POINT a, POINT b) {
 
 	GetDIBits(hDC, hBitmap, 0, height, pixels, (BITMAPINFO*)& bmi, DIB_RGB_COLORS);
 
+	BITMAPINFOHEADER bmiZoom = { 0 };
+	bmiZoom.biSize = sizeof(BITMAPINFOHEADER);
+	bmiZoom.biPlanes = 1;
+	bmiZoom.biBitCount = 32;
+	bmiZoom.biWidth = width * 2;
+	bmiZoom.biHeight = -height * 2;
+	bmiZoom.biCompression = BI_RGB;
+	bmiZoom.biSizeImage = 0; // 3 * ScreenX * ScreenY
+
 	int displacement = 200;
 	// renders pixels on screen at displacement lower than center
-	SetDIBitsToDevice(dc, a.x, a.y + displacement, width, height, 0, 0, 0, height, zoom(pixels), (BITMAPINFO*)& bmi, DIB_RGB_COLORS); // will need to update parameters after implementation of zoom
+	SetDIBitsToDevice(dc, a.x, a.y + displacement, width * 2, height * 2, 0, 0, 0, height * 2, zoom(pixels), (BITMAPINFO*)& bmiZoom, DIB_RGB_COLORS); // will need to update parameters after implementation of zoom
 
 	// clean up
 	SelectObject(hDC, old_obj);
@@ -78,10 +92,9 @@ int main() {
 	a.y = screenHeight / 2 - height / 2;
 	b.x = screenWidth / 2 + width / 2;
 	b.y = screenHeight / 2 + height / 2;
-	//RGBQUAD* pixels;
 	while (true) {
 		capture(a, b);
-		Sleep(8);
+		Sleep(1);
 	}
 }
 
