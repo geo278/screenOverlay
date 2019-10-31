@@ -94,13 +94,11 @@ void capture() {
 void captureThread() {
 	while (true) {
 		capture();
-		Sleep(1);
+		Sleep(0.3);
 	}
 }
 
 int main() {
-	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)captureThread, 0, 0, 0);
-	Sleep(0.5);
 	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)captureThread, 0, 0, 0);
 	while (true) {
 		Sleep(1000);

@@ -1,3 +1,3 @@
 ﻿  screenOverlay.cpp
-C:\Users\georg\CPSC\screenOverlay\screenOverlay\screenOverlay.cpp(103,8): warning C4244:  'argument': conversion from 'double' to 'DWORD', possible loss of data
+C:\Users\georg\CPSC\screenOverlay\screenOverlay\screenOverlay.cpp(97,9): warning C4244:  'argument': conversion from 'double' to 'DWORD', possible loss of data
   screenOverlay.vcxproj -> C:\Users\georg\CPSC\screenOverlay\Debug\screenOverlay.exe
