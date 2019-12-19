@@ -4,6 +4,25 @@
 
 using namespace std;
 
+MAGCOLOREFFECT g_MagEffectGrayscale = {0.3f,  0.3f,  0.3f,  0.0f,  0.0f,
+                                       0.6f,  0.6f,  0.6f,  0.0f,  0.0f,
+                                       0.1f,  0.1f,  0.1f,  0.0f,  0.0f,
+                                       0.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+                                       0.0f,  0.0f,  0.0f,  0.0f,  1.0f};
+
+MAGCOLOREFFECT g_MagEffectIdentity = {1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+                                      0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+                                      0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+                                      0.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+                                      0.0f,  0.0f,  0.0f,  0.0f,  1.0f};
+
+BOOL SetColorGrayscale(__in BOOL fGrayscaleOn) {
+    // Apply the color matrix required to either apply grayscale to the screen 
+    // colors or to show the regular colors.
+    PMAGCOLOREFFECT pEffect = (fGrayscaleOn ? &g_MagEffectGrayscale : &g_MagEffectIdentity);
+    return MagSetFullscreenColorEffect(pEffect);
+}
+
 BOOL SetZoomB(float magFactor) {
 	if (magFactor < 1.0) {
 		return FALSE;
