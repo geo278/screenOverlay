@@ -38,11 +38,11 @@ int main() {
 		while (true) {
 			if ((GetKeyState(VK_RBUTTON) & 0x100) != 0) {
 				SetZoomB(2);
-				cout << "Zoom In" << endl;
+				cout << "Enhance" << endl;
 				while ((GetKeyState(VK_RBUTTON) & 0x100) != 0) { Sleep(20); }
 			} else {
 				SetZoomB(1);
-				cout << "Zoom Out" << endl;
+				cout << "Restore" << endl;
 				while ((GetKeyState(VK_RBUTTON) & 0x100) == 0) { Sleep(2); }
 			}
 		}
