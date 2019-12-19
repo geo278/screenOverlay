@@ -4,9 +4,10 @@
 
 using namespace std;
 
-MAGCOLOREFFECT g_MagEffectGrayscale = {0.3f,  0.3f,  0.3f,  0.0f,  0.0f,
-                                       0.6f,  0.6f,  0.6f,  0.0f,  0.0f,
-                                       0.1f,  0.1f,  0.1f,  0.0f,  0.0f,
+// https://docs.rainmeter.net/tips/colormatrix-guide/
+MAGCOLOREFFECT g_MagEffectGrayscale = {0.33f,  0.33f,  0.33f,  0.0f,  0.0f,
+                                       0.59f,  0.59f,  0.59f,  0.0f,  0.0f,
+                                       0.11f,  0.11f,  0.11f,  0.0f,  0.0f,
                                        0.0f,  0.0f,  0.0f,  1.0f,  0.0f,
                                        0.0f,  0.0f,  0.0f,  0.0f,  1.0f};
 
@@ -34,7 +35,7 @@ BOOL SetZoomB(float magFactor) {
 
 int main() {
 	if (MagInitialize()) {
-		cout << "Initialized" << endl;
+		cout << "Initialized" << endl << endl;
 		while (true) {
 			if ((GetKeyState(VK_RBUTTON) & 0x100) != 0) {
 				SetZoomB(2);
