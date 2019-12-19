@@ -1,117 +1,33 @@
-// screenOverlay.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
-#include <Windows.h>
+#include "windows.h"
+#include "magnification.h"
 
-HDC dc = GetDC(HWND_DESKTOP);
-int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-const int width = 180;
-const int height = 180;
-const int ax = screenWidth / 2 - width / 2;
-const int ay = screenHeight / 2 - height / 2;
-const int bx = screenWidth / 2 + width / 2;
-const int by = screenHeight / 2 + height / 2;
+using namespace std;
 
-/*
-COLORREF colour = RGB(255, 0, 0); // red
-void row(int width) {
-	for (int i = 0; i < width; i++) {
-		SetPixel(dc, i + screenWidth / 2 - width / 2, screenHeight / 2 - 1, colour);
+BOOL SetZoomB(float magFactor) {
+	if (magFactor < 1.0) {
+		return FALSE;
 	}
-	for (int i = 0; i < width; i++) {
-		SetPixel(dc, i + screenWidth / 2 - width / 2, screenHeight / 2, colour);
-	}
-}
-void col(int height) {
-	for (int i = 0; i < height; i++) {
-		SetPixel(dc, screenWidth / 2 - 1, i + screenHeight / 2 - height / 2, colour);
-	}
-	for (int i = 0; i < height; i++) {
-		SetPixel(dc, screenWidth / 2, i + screenHeight / 2 - height / 2, colour);
-	}
-}
-*/
-
-RGBQUAD* zoom(RGBQUAD* pixels) {
-	const int size = width * height * 4;
-	static RGBQUAD result[size];
-	int resultX, resultY, pixelsX, pixelsY;
-	for (int i = 0; i < size; i++) {
-		resultX = i % (width * 2);
-		resultY = i / (width * 2);
-		pixelsX = resultX / 2;
-		pixelsY = resultY / 2;
-		result[i] = pixels[pixelsY * width + pixelsX];
-	}
-	return result;
-}
-
-void capture() {
-	// copy screen to bitmap
-	HDC     hScreen = GetDC(NULL);
-	HDC     hDC = CreateCompatibleDC(hScreen);
-	HBITMAP hBitmap = CreateCompatibleBitmap(hScreen, abs(bx - ax), abs(by - ay));
-	HGDIOBJ old_obj = SelectObject(hDC, hBitmap);
-	BOOL    bRet = BitBlt(hDC, 0, 0, abs(bx - ax), abs(by - ay), hScreen, ax, ay, SRCCOPY); // BitBlt does the copying
-
-	// Array conversion:
-	RGBQUAD* pixels = new RGBQUAD[width * height];
-
-	BITMAPINFOHEADER bmi = { 0 };
-	bmi.biSize = sizeof(BITMAPINFOHEADER);
-	bmi.biPlanes = 1;
-	bmi.biBitCount = 32;
-	bmi.biWidth = width;
-	bmi.biHeight = -height;
-	bmi.biCompression = BI_RGB;
-	bmi.biSizeImage = 0; // 3 * ScreenX * ScreenY
-
-	GetDIBits(hDC, hBitmap, 0, height, pixels, (BITMAPINFO*)& bmi, DIB_RGB_COLORS);
-
-	BITMAPINFOHEADER bmiZoom = { 0 };
-	bmiZoom.biSize = sizeof(BITMAPINFOHEADER);
-	bmiZoom.biPlanes = 1;
-	bmiZoom.biBitCount = 32;
-	bmiZoom.biWidth = width * 2;
-	bmiZoom.biHeight = -height * 2;
-	bmiZoom.biCompression = BI_RGB;
-	bmiZoom.biSizeImage = 0; // 3 * ScreenX * ScreenY
-
-	int displacement = 200;
-	// renders pixels on screen at displacement lower than center
-	SetDIBitsToDevice(dc, ax, ay + displacement, width * 2, height * 2, 0, 0, 0, height * 2, zoom(pixels), (BITMAPINFO*)& bmiZoom, DIB_RGB_COLORS); // will need to update parameters after implementation of zoom
-
-	// clean up
-	SelectObject(hDC, old_obj);
-	DeleteDC(hDC);
-	ReleaseDC(NULL, hScreen);
-	DeleteObject(hBitmap);
-	delete[] pixels;
-}
-
-void captureThread() {
-	while (true) {
-		capture();
-		Sleep(0.3);
-	}
+	int xOffset = (int)((float)GetSystemMetrics(SM_CXSCREEN) * (1.0 - (1.0 / magFactor)) / 2.0);
+	int yOffset = (int)((float)GetSystemMetrics(SM_CYSCREEN) * (1.0 - (1.0 / magFactor)) / 2.0);
+	return MagSetFullscreenTransform(magFactor, xOffset, yOffset);
 }
 
 int main() {
-	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)captureThread, 0, 0, 0);
-	while (true) {
-		Sleep(1000);
+	if (MagInitialize()) {
+		cout << "Initialized" << endl;
+		while (true) {
+			if ((GetKeyState(VK_RBUTTON) & 0x100) != 0) {
+				SetZoomB(2);
+				cout << "Zoom In" << endl;
+				while ((GetKeyState(VK_RBUTTON) & 0x100) != 0) { Sleep(20); }
+			} else {
+				SetZoomB(1);
+				cout << "Zoom Out" << endl;
+				while ((GetKeyState(VK_RBUTTON) & 0x100) == 0) { Sleep(2); }
+			}
+		}
+		Sleep(2);
 	}
+	return 0;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
