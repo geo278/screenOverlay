@@ -4,7 +4,7 @@
 
 using namespace std;
 
-float c = (float) 1.15;
+float c = (float) 1.1;
 float t =  ((float) 1.0 - c) / (float) 2.0;
 MAGCOLOREFFECT g_MagEffectTransform = { c,		0.0f,	0.0f,	0.0f,	0.0f,
                                         0.0f,	c,		0.0f,	0.0f,	0.0f,
