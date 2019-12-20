@@ -4,12 +4,13 @@
 
 using namespace std;
 
-// https://docs.rainmeter.net/tips/colormatrix-guide/
-MAGCOLOREFFECT g_MagEffectGrayscale = {0.33f,  0.33f,  0.33f,  0.0f,  0.0f,
-                                       0.59f,  0.59f,  0.59f,  0.0f,  0.0f,
-                                       0.11f,  0.11f,  0.11f,  0.0f,  0.0f,
-                                       0.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-                                       0.0f,  0.0f,  0.0f,  0.0f,  1.0f};
+float c = (float) 1.15;
+float t =  ((float) 1.0 - c) / (float) 2.0;
+MAGCOLOREFFECT g_MagEffectTransform = { c,		0.0f,	0.0f,	0.0f,	0.0f,
+                                        0.0f,	c,		0.0f,	0.0f,	0.0f,
+                                        0.0f,	0.0f,	c,		0.0f,	0.0f,
+                                        0.0f,	0.0f,	0.0f,	1.0f,	0.0f,
+									    t,		t,		t,		0.0f,	1.0f};
 
 MAGCOLOREFFECT g_MagEffectIdentity = {1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
                                       0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
@@ -17,10 +18,8 @@ MAGCOLOREFFECT g_MagEffectIdentity = {1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
                                       0.0f,  0.0f,  0.0f,  1.0f,  0.0f,
                                       0.0f,  0.0f,  0.0f,  0.0f,  1.0f};
 
-BOOL SetColorGrayscale(__in BOOL fGrayscaleOn) {
-    // Apply the color matrix required to either apply grayscale to the screen 
-    // colors or to show the regular colors.
-    PMAGCOLOREFFECT pEffect = (fGrayscaleOn ? &g_MagEffectGrayscale : &g_MagEffectIdentity);
+BOOL transformColor(__in BOOL transformationOn) {// Apply the color matrix 
+    PMAGCOLOREFFECT pEffect = (transformationOn ? &g_MagEffectTransform : &g_MagEffectIdentity);
     return MagSetFullscreenColorEffect(pEffect);
 }
 
@@ -39,10 +38,12 @@ int main() {
 		while (true) {
 			if ((GetKeyState(VK_RBUTTON) & 0x100) != 0) {
 				SetZoomB(2);
+				transformColor(TRUE);
 				cout << "Enhance" << endl;
 				while ((GetKeyState(VK_RBUTTON) & 0x100) != 0) { Sleep(20); }
 			} else {
 				SetZoomB(1);
+				transformColor(FALSE);
 				cout << "Restore" << endl;
 				while ((GetKeyState(VK_RBUTTON) & 0x100) == 0) { Sleep(2); }
 			}
