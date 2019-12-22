@@ -4,13 +4,15 @@
 
 using namespace std;
 
-float c = (float) 1.1;
-float t =  ((float) 1.0 - c) / (float) 2.0;
-MAGCOLOREFFECT g_MagEffectTransform = { c,		0.0f,	0.0f,	0.0f,	0.0f,
-                                        0.0f,	c,		0.0f,	0.0f,	0.0f,
-                                        0.0f,	0.0f,	c,		0.0f,	0.0f,
+float s = (float) 2;
+float sr = (float)(1 - s) * 0.3086;
+float sg = (float)(1 - s) * 0.6094;
+float sb = (float)(1 - s) * 0.0820;
+MAGCOLOREFFECT g_MagEffectTransform = { sr + s,	sr,		sr,		0.0f,	0.0f,
+										sg,		sg + s,	sg,		0.0f,	0.0f,
+										sb,		sb,		sb + s,	0.0f,	0.0f,
                                         0.0f,	0.0f,	0.0f,	1.0f,	0.0f,
-									    t,		t,		t,		0.0f,	1.0f};
+										0.0f,	0.0f,	0.0f,	0.0f,	1.0f};
 
 MAGCOLOREFFECT g_MagEffectIdentity = {1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
                                       0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
