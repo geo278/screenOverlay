@@ -4,7 +4,7 @@
 
 using namespace std;
 
-float s = (float) 5;
+float s = (float) 1.1;
 float sr = (float)(1 - s) * 0.3086;
 float sg = (float)(1 - s) * 0.6094;
 float sb = (float)(1 - s) * 0.0820;
@@ -34,7 +34,7 @@ int main() {
 		cout << "Initialized" << endl << endl;
 		while (true) {
 			if ((GetKeyState(VK_RBUTTON) & 0x100) != 0) {
-				SetZoomB(2);
+				SetZoomB(1.2);
 				MagSetFullscreenColorEffect(&g_MagEffectSaturation);
 				cout << "Enhance" << endl;
 				while ((GetKeyState(VK_RBUTTON) & 0x100) != 0) { Sleep(20); }
