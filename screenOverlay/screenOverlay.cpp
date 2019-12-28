@@ -34,7 +34,7 @@ int main() {
 		cout << "Initialized" << endl << endl;
 		while (true) {
 			if ((GetKeyState(VK_RBUTTON) & 0x100) != 0) {
-				SetZoomB(3);
+				SetZoomB(2);
 				MagSetFullscreenColorEffect(&g_MagEffectSaturation);
 				cout << "Enhance" << endl;
 				while ((GetKeyState(VK_RBUTTON) & 0x100) != 0) { Sleep(20); }
