@@ -1,5 +1,2 @@
 ﻿  screenOverlay.cpp
-C:\Users\georg\Documents\GitHub\screenOverlay\screenOverlay\screenOverlay.cpp(8,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\georg\Documents\GitHub\screenOverlay\screenOverlay\screenOverlay.cpp(9,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\georg\Documents\GitHub\screenOverlay\screenOverlay\screenOverlay.cpp(10,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   screenOverlay.vcxproj -> C:\Users\georg\Documents\GitHub\screenOverlay\x64\Debug\screenOverlay.exe
