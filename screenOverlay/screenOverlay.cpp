@@ -40,7 +40,7 @@ int main() {
 		cout << "Initialized" << endl << endl;
 		while (true) {
 			if ((GetKeyState(VK_RBUTTON) & 0x100) != 0) {
-				SetZoomB(2);
+				SetZoomB(4);
 				//MagSetFullscreenColorEffect(&g_MagEffectSaturation);
 				cout << "Zoom In" << endl;
 				while ((GetKeyState(VK_RBUTTON) & 0x100) != 0) { Sleep(20); }
