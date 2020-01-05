@@ -27,10 +27,15 @@ BOOL SetZoomB(float magFactor) {
 		return FALSE;
 	}
 	xSize = GetSystemMetrics(SM_CXSCREEN);
-	int ySize = GetSystemMetrics(SM_CYSCREEN);
+	ySize = GetSystemMetrics(SM_CYSCREEN);
+	//cout << xSize << "  " << ySize << endl;
 	if (xSize == 2048 && ySize == 1152) {
 		xSize = 2560;
 		ySize = 1440;
+	}
+	if (xSize == 2133 && ySize == 1200) {
+		xSize = 3200;
+		ySize = 1800;
 	}
 	int xOffset = (int)((float)xSize * (1.0 - (1.0 / magFactor)) / 2.0);
 	int yOffset = (int)((float)ySize * (1.0 - (1.0 / magFactor)) / 2.0);
@@ -68,7 +73,7 @@ void reticule() {
 	RGBQUAD* p;
 	p = pixels;
 	while (true) {
-		SetDIBitsToDevice(dc, xSize / 2 - 1, ySize / 2 - 1 + 144, 2, 2, 0, 0, 0, 2, p, (BITMAPINFO*)&bmi, DIB_RGB_COLORS); // will need to update parameters after implementation of zoom
+		SetDIBitsToDevice(dc, xSize / 2 - 1, ySize / 2 - 1, 2, 2, 0, 0, 0, 2, p, (BITMAPINFO*)&bmi, DIB_RGB_COLORS); // will need to update parameters after implementation of zoom
 		Sleep(1);
 	}
 }
