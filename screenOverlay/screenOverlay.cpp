@@ -7,6 +7,9 @@ float s = (float) 1.1;
 float sr = (float)(1 - s) * (float)0.3086;
 float sg = (float)(1 - s) * (float)0.6094;
 float sb = (float)(1 - s) * (float)0.0820;
+bool enabled = true; 
+int xSize = GetSystemMetrics(SM_CXSCREEN);
+int ySize = GetSystemMetrics(SM_CYSCREEN);
 MAGCOLOREFFECT g_MagEffectSaturation = {sr + s,	sr,		sr,		0.0f,	0.0f,
 										sg,		sg + s,	sg,		0.0f,	0.0f,
 										sb,		sb,		sb + s,	0.0f,	0.0f,
@@ -23,7 +26,7 @@ BOOL SetZoomB(float magFactor) {
 	if (magFactor < 1.0) {
 		return FALSE;
 	}
-	int xSize = GetSystemMetrics(SM_CXSCREEN);
+	xSize = GetSystemMetrics(SM_CXSCREEN);
 	int ySize = GetSystemMetrics(SM_CYSCREEN);
 	if (xSize == 2048 && ySize == 1152) {
 		xSize = 2560;
@@ -35,20 +38,58 @@ BOOL SetZoomB(float magFactor) {
 	return MagSetFullscreenTransform(magFactor, xOffset, yOffset);
 }
 
+void trackEnabled() {
+	while (true) {
+		if ((GetKeyState(VK_MENU) & 0x100) != 0) {
+			enabled = !enabled;
+			while ((GetKeyState(VK_MENU) & 0x100) != 0) {
+				Sleep(20);
+			}
+		}
+		Sleep(10);
+	}
+}
+
+void reticule() {
+	HDC dc = GetDC(HWND_DESKTOP);
+	BITMAPINFOHEADER bmi = { 0 };
+	bmi.biSize = sizeof(BITMAPINFOHEADER);
+	bmi.biPlanes = 1;
+	bmi.biBitCount = 32;
+	bmi.biWidth = 2;
+	bmi.biHeight = -2;
+	bmi.biCompression = BI_RGB;
+	bmi.biSizeImage = 0; // 3 * ScreenX * ScreenY
+	RGBQUAD centerColour;
+	centerColour.rgbRed = 0;
+	centerColour.rgbBlue = 0;
+	centerColour.rgbGreen = 255;
+	RGBQUAD pixels[4] = {centerColour, centerColour, centerColour, centerColour};
+	RGBQUAD* p;
+	p = pixels;
+	while (true) {
+		SetDIBitsToDevice(dc, xSize / 2 - 1, ySize / 2 - 1 + 144, 2, 2, 0, 0, 0, 2, p, (BITMAPINFO*)&bmi, DIB_RGB_COLORS); // will need to update parameters after implementation of zoom
+		Sleep(1);
+	}
+}
+
 int main() {
+	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)trackEnabled, 0, 0, 0);
+	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)reticule, 0, 0, 0);
+
 	if (MagInitialize()) {
 		cout << "Initialized" << endl << endl;
 		while (true) {
-			if ((GetKeyState(VK_RBUTTON) & 0x100) != 0) {
-				SetZoomB(4);
+			if ((GetKeyState(VK_RBUTTON) & 0x100) != 0 && enabled) {
+				SetZoomB(2);
 				//MagSetFullscreenColorEffect(&g_MagEffectSaturation);
 				cout << "Zoom In" << endl;
-				while ((GetKeyState(VK_RBUTTON) & 0x100) != 0) { Sleep(20); }
+				while ((GetKeyState(VK_RBUTTON) & 0x100) != 0 && enabled) { Sleep(10); }
 			} else {
 				SetZoomB(1);
 				//MagSetFullscreenColorEffect(&g_MagEffectIdentity);
 				cout << "Restore" << endl;
-				while ((GetKeyState(VK_RBUTTON) & 0x100) == 0) { Sleep(2); }
+				while ((GetKeyState(VK_RBUTTON) & 0x100) == 0 || !enabled) { Sleep(2); }
 			}
 		}
 		Sleep(2);
