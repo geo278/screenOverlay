@@ -10,6 +10,7 @@ float sb = (float)(1 - s) * (float)0.0820;
 bool enabled = true; 
 int xSize = GetSystemMetrics(SM_CXSCREEN);
 int ySize = GetSystemMetrics(SM_CYSCREEN);
+float zoom = 2;
 MAGCOLOREFFECT g_MagEffectSaturation = {sr + s,	sr,		sr,		0.0f,	0.0f,
 										sg,		sg + s,	sg,		0.0f,	0.0f,
 										sb,		sb,		sb + s,	0.0f,	0.0f,
@@ -43,18 +44,6 @@ BOOL SetZoomB(float magFactor) {
 	return MagSetFullscreenTransform(magFactor, xOffset, yOffset);
 }
 
-void trackEnabled() {
-	while (true) {
-		if ((GetKeyState(VK_MENU) & 0x100) != 0) {
-			enabled = !enabled;
-			while ((GetKeyState(VK_MENU) & 0x100) != 0) {
-				Sleep(20);
-			}
-		}
-		Sleep(10);
-	}
-}
-
 void reticule() {
 	HDC dc = GetDC(HWND_DESKTOP);
 	BITMAPINFOHEADER bmi = { 0 };
@@ -78,15 +67,36 @@ void reticule() {
 	}
 }
 
+void trackEnabled() {
+	while (true) {
+		if ((GetKeyState(VK_MENU) & 0x100) != 0) {
+			enabled = !enabled;
+			while ((GetKeyState(VK_MENU) & 0x100) != 0) {
+				Sleep(20);
+			}
+		}
+		Sleep(10);
+	}
+}
+
+void trackZoom() {
+	while (true) {
+		cout << "enter zoom factor (current: " << zoom << ")" << endl;
+		cin >> zoom;
+		Sleep(50);
+	}
+}
+
 int main() {
-	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)trackEnabled, 0, 0, 0);
 	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)reticule, 0, 0, 0);
+	// CreateThread(0, 0, (LPTHREAD_START_ROUTINE)trackEnabled, 0, 0, 0);
+	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)trackZoom, 0, 0, 0);
 
 	if (MagInitialize()) {
 		cout << "Initialized" << endl << endl;
 		while (true) {
 			if ((GetKeyState(VK_RBUTTON) & 0x100) != 0 && enabled) {
-				SetZoomB(2);
+				SetZoomB(zoom);
 				//MagSetFullscreenColorEffect(&g_MagEffectSaturation);
 				cout << "Zoom In" << endl;
 				while ((GetKeyState(VK_RBUTTON) & 0x100) != 0 && enabled) { Sleep(10); }
