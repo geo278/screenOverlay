@@ -72,6 +72,7 @@ void trackKillable() {
 	while (true) {
 		if ((GetKeyState(VK_F1) & 0x100) != 0) {
 			killable = !killable;
+			killable ? cout << "Killable" << endl : cout << "Not Killable" << endl;
 			while ((GetKeyState(VK_F1) & 0x100) != 0) {
 				Sleep(40);
 			}
@@ -97,8 +98,7 @@ void trackZoom() {
 				//MagSetFullscreenColorEffect(&g_MagEffectSaturation);
 				cout << "Zoom In" << endl;
 				while ((GetKeyState(VK_RBUTTON) & 0x100) != 0) { Sleep(10); }
-			}
-			else {
+			} else {
 				SetZoomB(1);
 				//MagSetFullscreenColorEffect(&g_MagEffectIdentity);
 				cout << "Restore" << endl;
@@ -114,7 +114,6 @@ int main() {
 	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)reticule, 0, 0, 0);
 	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)trackZoom, 0, 0, 0);
 	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)trackKillable, 0, 0, 0);
-
 
 	while (true) {
 		if ((GetKeyState(VK_MENU) & 0x100) != 0 && (GetKeyState(VK_TAB) & 0x100) != 0 && killable) {
