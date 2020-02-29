@@ -3,11 +3,12 @@
 #include "magnification.h"
 
 using namespace std;
+
+bool killable = true;
 float s = (float) 1.1;
 float sr = (float)(1 - s) * (float)0.3086;
 float sg = (float)(1 - s) * (float)0.6094;
 float sb = (float)(1 - s) * (float)0.0820;
-bool killAll = false; 
 int xSize = GetSystemMetrics(SM_CXSCREEN);
 int ySize = GetSystemMetrics(SM_CYSCREEN);
 float zoom = 2;
@@ -63,31 +64,29 @@ void reticule() {
 	p = pixels;
 	while (true) {
 		SetDIBitsToDevice(dc, xSize / 2 - 1, ySize / 2 - 1, 2, 2, 0, 0, 0, 2, p, (BITMAPINFO*)&bmi, DIB_RGB_COLORS); // will need to update parameters after implementation of zoom
-		Sleep(1);
-		if (killAll) { break; }
+		Sleep(3);
 	}
 }
 
-//void trackEnabled() {
+void trackKillable() {
+	while (true) {
+		if ((GetKeyState(VK_F1) & 0x100) != 0) {
+			killable = !killable;
+			while ((GetKeyState(VK_F1) & 0x100) != 0) {
+				Sleep(40);
+			}
+		}
+		Sleep(10);
+	}
+}
+
+//void trackZoomInput() {
 //	while (true) {
-//		if ((GetKeyState(VK_MENU) & 0x100) != 0) {
-//			enabled = !enabled;
-//			while ((GetKeyState(VK_MENU) & 0x100) != 0) {
-//				Sleep(20);
-//			}
-//		}
-//		Sleep(10);
+//		cout << "enter zoom factor (current: " << zoom << ")" << endl;
+//		cin >> zoom;
+//		Sleep(50);
 //	}
 //}
-
-void trackZoomInput() {
-	while (true) {
-		cout << "enter zoom factor (current: " << zoom << ")" << endl;
-		cin >> zoom;
-		Sleep(50);
-		if (killAll) { break; }
-	}
-}
 
 void trackZoom() {
 	if (MagInitialize()) {
@@ -103,10 +102,9 @@ void trackZoom() {
 				SetZoomB(1);
 				//MagSetFullscreenColorEffect(&g_MagEffectIdentity);
 				cout << "Restore" << endl;
-				while ((GetKeyState(VK_RBUTTON) & 0x100) == 0) { Sleep(2); }
+				while ((GetKeyState(VK_RBUTTON) & 0x100) == 0) { Sleep(10); }
 			}
-			Sleep(2);
-			if (killAll) { break; }
+			Sleep(5);
 		}
 	}
 }
@@ -114,20 +112,18 @@ void trackZoom() {
 int main() {
 	Sleep(5000);
 	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)reticule, 0, 0, 0);
-	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)trackZoomInput, 0, 0, 0);
 	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)trackZoom, 0, 0, 0);
+	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)trackKillable, 0, 0, 0);
+
 
 	while (true) {
-		if ((GetKeyState(VK_MENU) & 0x100) != 0 && (GetKeyState(VK_TAB) & 0x100) != 0) {
-			//killAll = true;
-			//Sleep(3000);
-			//killAll = false;
-
+		if ((GetKeyState(VK_MENU) & 0x100) != 0 && (GetKeyState(VK_TAB) & 0x100) != 0 && killable) {
+			// self revive
 			LPCTSTR open = L"open";
 			LPCWSTR path = L"C:\\Users\\georg\\Documents\\GitHub\\screenOverlay\\x64\\Debug\\screenOverlay.exe";
-
 			ShellExecute(NULL, open, path, NULL, NULL, SW_SHOWDEFAULT);
 
+			// kill
 			break;
 		}
 		Sleep(20);
